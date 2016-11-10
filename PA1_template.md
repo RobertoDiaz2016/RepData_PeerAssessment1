@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 
 ```r
@@ -28,12 +33,19 @@ str(activity)
 steps_per_day <- aggregate(steps~date,data=activity,sum)
 
 require(ggplot2)
+```
+
+```
+## Loading required package: ggplot2
+```
+
+```r
 library(ggplot2)
 ggplot(steps_per_day,aes(steps,fill=date)) +
 geom_histogram(binwidth = 53)
 ```
 
-![](PA1_template_files/figure-html/MeanTotalStepsPerDay-1.png)<!-- -->
+![plot of chunk MeanTotalStepsPerDay](figure/MeanTotalStepsPerDay-1.png)
 
 ```r
 na_mean_steps_per_day <- as.integer(mean(steps_per_day$steps))
@@ -52,7 +64,7 @@ ggplot(avg_steps_per_day, aes(interval, steps)) +
         geom_line()
 ```
 
-![](PA1_template_files/figure-html/AverageDailyActivityPattern-1.png)<!-- -->
+![plot of chunk AverageDailyActivityPattern](figure/AverageDailyActivityPattern-1.png)
 
 ```r
 interval_max_steps <- avg_steps_per_day[avg_steps_per_day$steps==max(avg_steps_per_day$steps),]
@@ -76,7 +88,7 @@ ggplot(steps_per_day,aes(steps,fill=date)) +
 geom_histogram(binwidth = 53)
 ```
 
-![](PA1_template_files/figure-html/ImputMissingValues-1.png)<!-- -->
+![plot of chunk ImputMissingValues](figure/ImputMissingValues-1.png)
 
 ```r
 mean_steps_per_day <- as.integer(mean(steps_per_day$steps))
@@ -97,7 +109,7 @@ Means went from 10766 to 10749
 
 Medians went from 10765 to 10641
 
-Histograms went from a max count of 3 at appoximately 15000 steps to a max count of 8 at slightly above 10000 steps
+Histograms went from a max count of 3 at appoximately 15000 steps to a max count of 8 at slightly over 10000 steps
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -112,4 +124,4 @@ ggplot(avg_steps_per_day, aes(interval, steps)) +
         facet_wrap(~day,ncol = 1)
 ```
 
-![](PA1_template_files/figure-html/DifferenceActivityPatternsWeekdaysWeekends-1.png)<!-- -->
+![plot of chunk DifferenceActivityPatternsWeekdaysWeekends](figure/DifferenceActivityPatternsWeekdaysWeekends-1.png)
