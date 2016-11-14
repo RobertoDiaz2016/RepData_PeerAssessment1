@@ -7,6 +7,8 @@ output:
 
 
 ```r
+require(ggplot2)
+library(ggplot2)
 library(knitr)
 opts_chunk$set(echo=TRUE)
 ```
@@ -32,24 +34,14 @@ str(activity)
 ```r
 steps_per_day <- aggregate(steps~date,data=activity,sum)
 
-require(ggplot2)
-```
-
-```
-## Loading required package: ggplot2
-```
-
-```r
-library(ggplot2)
-ggplot(steps_per_day,aes(steps,fill=date)) +
-geom_histogram(binwidth = 53)
+hist(steps_per_day$steps,xlab="Steps per day",main = "Histogram of Steps per day")
 ```
 
 ![plot of chunk MeanTotalStepsPerDay](figure/MeanTotalStepsPerDay-1.png)
 
 ```r
 na_mean_steps_per_day <- as.integer(mean(steps_per_day$steps))
-na_median_steps_per_day <- median(steps_per_day$steps)
+na_median_steps_per_day <- as.integer(median(steps_per_day$steps))
 ```
 Mean of the total number of steps taken per day: 10766  
 Median of the total number of steps taken per day: 10765  
@@ -61,7 +53,7 @@ Median of the total number of steps taken per day: 10765
 avg_steps_per_day <- aggregate(steps~interval,data=activity,mean)
 
 ggplot(avg_steps_per_day, aes(interval, steps)) + 
-        geom_line()
+        geom_line(col="green")
 ```
 
 ![plot of chunk AverageDailyActivityPattern](figure/AverageDailyActivityPattern-1.png)
@@ -76,40 +68,50 @@ Interval: 835, on average across all the days in the dataset, contains the maxim
 ## Imputing missing values
 
 ```r
-na_rows <- nrow(activity[is.na(activity),])
+# Rows with steps value of NA 
+na_rows <- nrow(activity[is.na(activity$steps),])
 
-# Used avg_steps_per_day for estimated values of na steps
+# steps NA values appear for the following dates:
+unique(activity[is.na(activity),2])
+```
+
+```
+## [1] "2012-10-01" "2012-10-08" "2012-11-01" "2012-11-04" "2012-11-09"
+## [6] "2012-11-10" "2012-11-14" "2012-11-30"
+```
+
+```r
+# Since there are NA values for steps in all intervals on these dates, estimating values for these dates with an aggregate would return NAs. Assumption: NA values imply no steps were taken, replacing NA values with 0.
 activity_tidy <- activity
-activity_tidy[is.na(activity_tidy)==TRUE] <- as.integer(avg_steps_per_day$steps)
+activity_tidy[is.na(activity_tidy)==TRUE] <- 0
 
 steps_per_day <- aggregate(steps~date,data=activity_tidy,sum)
 
-ggplot(steps_per_day,aes(steps,fill=date)) +
-geom_histogram(binwidth = 53)
+hist(steps_per_day$steps,xlab="Steps per day",main = "Histogram of Steps per day")
 ```
 
 ![plot of chunk ImputMissingValues](figure/ImputMissingValues-1.png)
 
 ```r
 mean_steps_per_day <- as.integer(mean(steps_per_day$steps))
-median_steps_per_day <- median(steps_per_day$steps)
+median_steps_per_day <- as.integer(median(steps_per_day$steps))
 ```
 
 
 Total number of missing values in the dataset (i.e. the total number of rows with NAs): 2304
 
-Mean of the total number of steps taken per day: 10749  
-Median of the total number of steps taken per day: 10641  
+Mean of the total number of steps taken per day: 9354  
+Median of the total number of steps taken per day: 10395  
 
-These values differ from the estimates from the first part of the assignment, an overall increase of max count with a left shift of its step indicator
+These values differ from the estimates from the first part of the assignment, Step per day bin, from 0 to 5000 increased.
 
 Imputing missing data on the estimates of the total daily number of steps impacts:
 
-Means went from 10766 to 10749
+Means went from 10766 to 9354
 
-Medians went from 10765 to 10641
+Medians went from 10765 to 10395
 
-Histograms went from a max count of 3 at appoximately 15000 steps to a max count of 8 at slightly over 10000 steps
+Histograms Step per day bin, from 0 to 5000, increased from 5 to 13.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
@@ -120,7 +122,7 @@ activity_tidy <- transform(activity_tidy,day=factor(ifelse(weekdays(as.Date(acti
 avg_steps_per_day <- aggregate(interval~steps +day,data=activity_tidy,mean)
 
 ggplot(avg_steps_per_day, aes(interval, steps)) + 
-        geom_line() +
+        geom_line(col="green") +
         facet_wrap(~day,ncol = 1)
 ```
 
